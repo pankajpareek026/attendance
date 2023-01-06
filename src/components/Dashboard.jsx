@@ -5,14 +5,13 @@ import StudentTable from './StudentTable';
 const print = console.log
 const Dashboard = () => {
   const [students, Setstudents] = useState([])
+  const [live, Setlive] = useState(0)
   let date = new Date().toDateString();
   useEffect(() => {
 
   }, [students])
   const [attendence, SetAttendence] = useState([])
   const [allStudents, SetallStudents] = useState(0)
-
-
   const [AddshowHide, SetAddShowHide] = useState(false)
   //function to performe hide and show operations 
   function addButtonHandler() {
@@ -31,7 +30,7 @@ const Dashboard = () => {
   const AddNewStudent = () => {
     // console.log(localStorage.getItem('student').length)
     console.log(name, fathersName, rollNumber, Class)
-    if (!name || !fathersName || !rollNumber ) {
+    if (!name || !fathersName || !rollNumber) {
       alert("All Fields Are Required !")
     }
     else {
@@ -43,6 +42,14 @@ const Dashboard = () => {
     }
   }
 
+  const liveCount = () => {
+    students.map((std, i) => {
+      if (std.attendence[0].position == "present" && std.attendence[0].checkIn != 0 && std.attendence[0].checkOut == "") {
+        Setlive(live + 1)
+      }
+    })
+  }
+
   const attendenceHandle = (roll, name, type) => {
     const agree = window.confirm(`Please Confirm >  ${name} Is ${type}`)
     if (agree) {
@@ -51,9 +58,7 @@ const Dashboard = () => {
           let atData = { position: type, date: date, checkIn: "", checkOut: "", roll: roll }
           const a = student.attendence
           a.push(atData)
-          print("before", student.attendence)
           Setstudents(student.attendence.concat(atData))
-          print("after", student.attendence)
           SetAttendence(attendence.concat(atData))
         }
         Setstudents(students)
@@ -72,6 +77,7 @@ const Dashboard = () => {
       }
     })
     Setstudents(students)
+    liveCount()
 
   }
   const checkOutHandle = (roll) => {
@@ -86,11 +92,12 @@ const Dashboard = () => {
       }
     })
     Setstudents(students)
+    liveCount()
   }
   return (
     <div className="Dashboard">
       <h1>Attendance Manager</h1>
-      <Details totalStudents={allStudents} />
+      <Details students={students} live={live} />
       <div className="button-container">
 
         <button className='btn' onClick={addButtonHandler} >Add Student</button>
@@ -137,7 +144,7 @@ const Dashboard = () => {
                 </td>
                 {
                   len > 0 && <><td key={student.rollNumber + 165} >{attendencePosition != "" && <button disabled={(attendencePosition == "" || attendencePosition == "absent" || student.attendence[len - 1].checkIn != "") && true} onClick={() => checkInHandle(student.rollNumber)} >{student.attendence[len - 1].checkIn == "" ? "checkin" : student.attendence[len - 1].checkIn}</button>}</td>
-                    <td key={student.rollNumber + 865} >{(attendencePosition != "" && checkInTime != "")}<button disabled={(student.attendence[len - 1].checkIn != "" && student.attendence[len - 1].chekOut == "") ? false : true} onClick={() => checkOutHandle(student.rollNumber)} >{student.attendence[len - 1].checkOut == "" ? "checkOut" : student.attendence[len - 1].checkOut}</button></td>
+                    <td key={student.rollNumber + 865} >{(attendencePosition != "" && checkInTime != "")}<button disabled={(student.attendence[len - 1].checkIn != "" || student.attendence[len - 1].chekOut == "") ? false : true} onClick={() => checkOutHandle(student.rollNumber)} >{student.attendence[len - 1].checkOut == "" ? "checkOut" : student.attendence[len - 1].checkOut}</button></td>
                   </>
                 }
               </tr>
