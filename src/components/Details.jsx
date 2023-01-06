@@ -3,10 +3,9 @@ import React from 'react'
 const Details = ({ students, live }) => {
 
   return (
-
     <div className="details">
       <div className="d-left">
-        Todal Students :{0}
+        Todal Students :{students.length}
       </div>
       <div className="d-right">
         Parsent :{live}
